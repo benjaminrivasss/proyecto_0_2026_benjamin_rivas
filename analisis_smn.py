@@ -1,11 +1,16 @@
-import funciones_analisis
-import sys
+from funciones_analisis import leer_observaciones, mostrar_resumen
 
-if len(sys.argv) != 2:
-    print("Uso: python analisis_smn.py datos/observaciones_smn.txt")
-else:
-    ruta = sys.argv[1]
+
+def main():
+    """
+    Ejecuta el programa principal.
+    """
+
+    ruta = input("Ingrese la ruta del archivo: ")
 
     observaciones = leer_observaciones(ruta)
 
     mostrar_resumen(observaciones)
+
+
+main()
