@@ -1,19 +1,45 @@
 def separar_viento(campo_viento: str) -> tuple:
-        """
-    Interpreta el campo de viento 'Norte 3' como (dirección, velocidad) y maneja el caso especial 'Calma', sin velocidad numérica.
     """
-        texto_limpio = campo_viento.strip()
-        if texto_limpio.lower() == "calma":
-            return ("Calma", 0.0)
-    
-        partes = texto_limpio.split()
-    
-        if len(partes) < 2:
-            return (texto_limpio, 0.0)
-    
-        direccion = " ".join(partes[:-1])
-        velocidad = float(partes[-1])
-        return (direccion, velocidad)
+    Interpreta el campo de viento 'Norte 3' como (dirección, velocidad)
+    y maneja el caso especial 'Calma'.
+    """
+
+    texto_limpio = campo_viento.strip()
+
+    if texto_limpio.lower() == "calma":
+        return ("Calma", 0.0)
+
+    partes = texto_limpio.split()
+
+    direccion = " ".join(partes[:-1])
+    velocidad = float(partes[-1])
+
+    return (direccion, velocidad)
+
+def datos_faltantes(observaciones: dict) -> dict:
+    """
+    Devuelve un diccionario con la cantidad de datos faltantes
+    por campo y las ciudades donde ocurren.
+    """
+
+    faltantes = {}
+
+    for ciudad, datos in observaciones.items():
+
+        for campo, valor in datos.items():
+
+            if valor is None:
+
+                if campo not in faltantes:
+                    faltantes[campo] = {
+                        "cantidad": 0,
+                        "ciudades": []
+                    }
+
+                faltantes[campo]["cantidad"] += 1
+                faltantes[campo]["ciudades"].append(ciudad)
+
+    return faltantes
 
 def leer_observaciones(ruta: str) -> dict:
     """
@@ -115,9 +141,7 @@ def cantidad_ciudades_completas(observaciones: dict) -> int:
             completas += 1
     return completas
 
-def top_n_ciudades(
-    observaciones: dict, campo: str, n: int, descendente: bool = True
-) -> list:
+def top_n_ciudades(observaciones: dict, campo: str, n: int,descendente: bool = True) -> list:
     """
     Devuelve las n ciudades ordenadas según 'campo', de mayor a menor
     (o de menor a mayor si descendente=False) en una lista de tuplas (ciudad, valor).
@@ -137,52 +161,53 @@ def top_n_ciudades(
     lista_validos.sort(key=obtener_valor, reverse=descendente)
     return lista_validos[:n]
 
+def mostrar_ranking(observaciones: dict,titulo: str,campo: str,n: int,descendente: bool = True,) -> None:
+    """
+    Muestra por pantalla las n ciudades ordenadas según el campo
+    indicado, de mayor a menor o de menor a mayor.
+    """
+
+    print(f"\n{titulo}")
+
+    ranking = top_n_ciudades(observaciones, campo, n, descendente)
+
+    for ciudad, valor in ranking:
+        print(f"{ciudad}: {valor}")
+    print()
+    
 def mostrar_resumen(observaciones: dict) -> None:
     """
     Muestra por pantalla un resumen de las observaciones.
     """
 
-    print(" RESUMEN ")
+    print("RESUMEN\n")
 
     print(f"Cantidad de ciudades: {cantidad_ciudades(observaciones)}")
     print(f"Cantidad de ciudades completas: {cantidad_ciudades_completas(observaciones)}")
 
-    print()
+    mostrar_ranking(observaciones, "Temperatura máxima:", "temperatura", 1)
 
-    print("Temperatura máxima:")
-    print(top_n_ciudades(observaciones, "temperatura", 1))
+    mostrar_ranking(observaciones, "Temperatura mínima:", "temperatura", 1, False)
 
-    print()
+    faltantes = datos_faltantes(observaciones)
 
-    print("Temperatura mínima:")
-    print(top_n_ciudades(observaciones, "temperatura", 1, False))
+    print("\nDatos faltantes:")
 
-    print()
+    if not faltantes:
+        print("No hay datos faltantes.")
+    else:
+        for campo, informacion in faltantes.items():
+            print(f"- {campo}: {informacion['cantidad']} dato(s)")
+            print("  Ciudades:", ", ".join(informacion["ciudades"]))
 
-    print("Mayor velocidad de viento:")
-    print(top_n_ciudades(observaciones, "velocidad_viento", 1))
+    mostrar_ranking(observaciones, "Mayor velocidad de viento:", "velocidad_viento", 1)
 
-    print()
+    mostrar_ranking(observaciones, "Menor velocidad de viento:", "velocidad_viento", 1, False)
 
-    print("Menor velocidad de viento:")
-    print(top_n_ciudades(observaciones, "velocidad_viento", 1, False))
+    mostrar_ranking(observaciones, "Top 5 ciudades más cálidas:", "temperatura", 5)
 
-    print()
+    mostrar_ranking(observaciones, "Top 5 ciudades más frías:", "temperatura", 5, False)
 
-    print("Top 5 ciudades más cálidas:")
-    print(top_n_ciudades(observaciones, "temperatura", 5))
+    mostrar_ranking(observaciones, "Top 5 ciudades con más viento:", "velocidad_viento", 5)
 
-    print()
-
-    print("Top 5 ciudades más frías:")
-    print(top_n_ciudades(observaciones, "temperatura", 5, False))
-
-    print()
-
-    print("Top 5 ciudades con más viento:")
-    print(top_n_ciudades(observaciones, "velocidad_viento", 5))
-
-    print()
-
-    print("Top 5 ciudades con menos viento:")
-    print(top_n_ciudades(observaciones, "velocidad_viento", 5, False))
+    mostrar_ranking(observaciones, "Top 5 ciudades con menos viento:", "velocidad_viento", 5, False)
