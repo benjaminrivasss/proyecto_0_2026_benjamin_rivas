@@ -98,9 +98,8 @@ def leer_observaciones(ruta: str) -> dict:
             humedad = None
 
         direccion_viento, velocidad_viento = separar_viento(campos[8])
-
         try:
-            presion = float(campos[9].strip())
+            presion = float(campos[9].strip().split()[0].replace(",", "."))
         except ValueError:
             presion = None
 
@@ -197,9 +196,15 @@ def mostrar_resumen(observaciones: dict) -> None:
         print("No hay datos faltantes.")
     else:
         for campo, informacion in faltantes.items():
-            print(f"- {campo}: {informacion['cantidad']} dato(s)")
-            print("  Ciudades:", ", ".join(informacion["ciudades"]))
 
+            print(f"- {campo}: {informacion['cantidad']} dato(s)")
+
+            print("  Ciudades:")
+
+            for ciudad in informacion["ciudades"]:
+                print(f"   - {ciudad}")
+
+            print()
     mostrar_ranking(observaciones, "Mayor velocidad de viento:", "velocidad_viento", 1)
 
     mostrar_ranking(observaciones, "Menor velocidad de viento:", "velocidad_viento", 1, False)
