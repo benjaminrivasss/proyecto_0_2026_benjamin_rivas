@@ -1,3 +1,36 @@
+from datetime import datetime
+MESES = {
+    "enero": 1,
+    "febrero": 2,
+    "marzo": 3,
+    "abril": 4,
+    "mayo": 5,
+    "junio": 6,
+    "julio": 7,
+    "agosto": 8,
+    "septiembre": 9,
+    "octubre": 10,
+    "noviembre": 11,
+    "diciembre": 12,
+}
+
+
+def convertir_fecha(fecha: str) -> datetime:
+    """
+    Convierte una fecha del formato '10-septiembre-2026'
+    en un objeto datetime.
+    """
+    dia, mes, anio = fecha.split("-")
+    return datetime(int(anio), MESES[mes.lower()], int(dia))
+
+
+def convertir_hora(hora: str):
+    """
+    Convierte una hora del formato '14:00'
+    en un objeto time.
+    """
+    return datetime.strptime(hora, "%H:%M").time()
+
 def separar_viento(campo_viento: str) -> tuple:
     """
     Interpreta el campo de viento 'Norte 3' como (dirección, velocidad)
@@ -72,9 +105,8 @@ def leer_observaciones(ruta: str) -> dict:
             continue
 
         ciudad = campos[0].strip()
-
-        fecha = campos[1].strip()
-        hora = campos[2].strip()
+        fecha = convertir_fecha(campos[1].strip())
+        hora = convertir_hora(campos[2].strip())
         condicion = campos[3].strip()
         visibilidad = campos[4].strip()
 

@@ -1,6 +1,6 @@
 import sys
 
-from funciones_analisis import leer_observaciones, mostrar_resumen
+from funciones_smn import leer_observaciones, mostrar_resumen
 
 
 def main():
