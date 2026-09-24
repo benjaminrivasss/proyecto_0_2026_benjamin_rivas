@@ -15,7 +15,7 @@ MESES = {
 }
 
 
-def convertir_fecha_y_hora(fecha: str, hora: str) -> datetime:
+def parsear_fecha_hora(fecha: str, hora: str) -> datetime:
     """
     Convierte una fecha del formato '10-septiembre-2026'
     y una hora del formato '14:00'
@@ -106,7 +106,7 @@ def leer_observaciones(ruta: str) -> dict:
             continue
 
         ciudad = campos[0].strip()
-        fecha_y_hora = convertir_fecha_y_hora(
+        fecha_y_hora = parsear_fecha_hora(
             campos[1].strip(),
             campos[2].strip())
         condicion = campos[3].strip()
