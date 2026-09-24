@@ -15,21 +15,22 @@ MESES = {
 }
 
 
-def convertir_fecha(fecha: str) -> datetime:
+def convertir_fecha_y_hora(fecha: str, hora: str) -> datetime:
     """
     Convierte una fecha del formato '10-septiembre-2026'
-    en un objeto datetime.
+    y una hora del formato '14:00'
+    en un único objeto datetime.
     """
     dia, mes, anio = fecha.split("-")
-    return datetime(int(anio), MESES[mes.lower()], int(dia))
+    horas, minutos = hora.split(":")
 
-
-def convertir_hora(hora: str):
-    """
-    Convierte una hora del formato '14:00'
-    en un objeto time.
-    """
-    return datetime.strptime(hora, "%H:%M").time()
+    return datetime(
+        int(anio),
+        MESES[mes.lower()],
+        int(dia),
+        int(horas),
+        int(minutos)
+    )
 
 def separar_viento(campo_viento: str) -> tuple:
     """
@@ -105,8 +106,9 @@ def leer_observaciones(ruta: str) -> dict:
             continue
 
         ciudad = campos[0].strip()
-        fecha = convertir_fecha(campos[1].strip())
-        hora = convertir_hora(campos[2].strip())
+        fecha_y_hora = convertir_fecha_y_hora(
+            campos[1].strip(),
+            campos[2].strip())
         condicion = campos[3].strip()
         visibilidad = campos[4].strip()
 
@@ -136,8 +138,7 @@ def leer_observaciones(ruta: str) -> dict:
             presion = None
 
         observaciones[ciudad] = {
-            "fecha": fecha,
-            "hora": hora,
+            "fecha_y_hora": fecha_y_hora,
             "condicion": condicion,
             "visibilidad": visibilidad,
             "temperatura": temperatura,
@@ -154,6 +155,25 @@ def leer_observaciones(ruta: str) -> dict:
         print(f"[Aviso] Se ignoraron {lineas_invalidas} línea(s) con formato inválido.")
 
     return observaciones
+
+def horarios_reportados(observaciones: dict) -> list:
+    """
+    Devuelve una lista de los horarios a los que las estaciones
+    reportaron, en formato "HH:MM", sin repetir y ordenados
+    de menor a mayor.
+    """
+    horarios = []
+
+    for datos in observaciones.values():
+        fecha_y_hora = datos["fecha_y_hora"]
+        horario = fecha_y_hora.strftime("%H:%M")
+
+        if horario not in horarios:
+            horarios.append(horario)
+
+    horarios.sort()
+
+    return horarios
 
 def cantidad_ciudades(observaciones: dict) -> int:
     """Devuelve la cantidad total de ciudades leídas."""
@@ -215,6 +235,7 @@ def mostrar_resumen(observaciones: dict) -> None:
 
     print(f"Cantidad de ciudades: {cantidad_ciudades(observaciones)}")
     print(f"Cantidad de ciudades completas: {cantidad_ciudades_completas(observaciones)}")
+    print(f"Horarios reportados: {', '.join(horarios_reportados(observaciones))}")
 
     mostrar_ranking(observaciones, "Temperatura máxima:", "temperatura", 1)
 
