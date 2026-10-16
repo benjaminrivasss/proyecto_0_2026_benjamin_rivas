@@ -1,3 +1,5 @@
+import json
+from pathlib import Path
 from datetime import datetime
 MESES = {
     "enero": 1,
@@ -203,6 +205,8 @@ def cantidad_ciudades_completas(observaciones: dict) -> int:
             completas += 1
     return completas
 
+
+
 def top_n_ciudades(observaciones: dict, campo: str, n: int,descendente: bool = True) -> list:
     """
     Devuelve las n ciudades ordenadas según 'campo', de mayor a menor
@@ -280,3 +284,48 @@ def mostrar_resumen(observaciones: dict) -> None:
     mostrar_ranking(observaciones, "Top 5 ciudades con más viento:", "velocidad_viento", 5)
 
     mostrar_ranking(observaciones, "Top 5 ciudades con menos viento:", "velocidad_viento", 5, False)
+
+
+def convertir_fechas(observaciones: dict) -> dict:
+    observaciones_json = {}
+
+    for ciudad, datos in observaciones.items():
+
+        datos_nuevos = datos.copy()
+
+        fecha = datos_nuevos["fecha_y_hora"]
+
+        datos_nuevos["fecha_y_hora"] = fecha.isoformat(
+            timespec="minutes"
+        )
+
+        observaciones_json[ciudad] = datos_nuevos
+
+    return observaciones_json
+
+
+def guardar_json(observaciones: dict, ruta_txt: str) -> None:
+
+    directorio = Path("obs_json")
+
+    if not directorio.exists():
+        print("El directorio obs_json no existe, creándolo...")
+        directorio.mkdir()
+        print("Directorio creado correctamente.")
+
+    nombre_archivo = Path(ruta_txt).stem + ".json"
+
+    ruta_json = directorio / nombre_archivo
+
+    observaciones_json = convertir_fechas(observaciones)
+
+    with open(ruta_json, "w", encoding="utf-8") as archivo:
+        json.dump(observaciones_json, archivo, indent=4, ensure_ascii=False)
+
+    print(f"Archivo JSON guardado correctamente: {ruta_json}")
+
+def leer_json(ruta: str) -> dict:
+    with open(ruta, "r", encoding="utf-8") as archivo:
+        observaciones = json.load(archivo)
+
+    return observaciones
