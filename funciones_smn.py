@@ -75,6 +75,15 @@ def datos_faltantes(observaciones: dict) -> dict:
 
     return faltantes
 
+def leer_texto(ruta: str) -> str:
+    try:
+        with open(ruta, "r", encoding="utf-8") as archivo:
+            return archivo.read()
+
+    except UnicodeDecodeError:
+        with open(ruta, "r", encoding="latin-1") as archivo:
+            return archivo.read()
+
 def leer_observaciones(ruta: str) -> dict:
     """
     Lee el archivo de observaciones del SMN y devuelve un diccionario:
@@ -85,15 +94,17 @@ def leer_observaciones(ruta: str) -> dict:
     lineas_invalidas = 0
 
     try:
-        archivo = open(ruta, "r", encoding="utf-8")
+        contenido = leer_texto(ruta)
+
     except FileNotFoundError:
         print(f"Error: No se encontró el archivo en la ruta '{ruta}'")
         return observaciones
-    except Exception as error:
+
+    except OSError as error:
         print(f"Error al intentar abrir el archivo: {error}")
         return observaciones
 
-    for linea in archivo:
+    for linea in contenido.splitlines():
         linea = linea.strip()
 
         if not linea:
@@ -149,7 +160,7 @@ def leer_observaciones(ruta: str) -> dict:
             "presion": presion,
         }
 
-    archivo.close()
+   
 
     if lineas_invalidas > 0:
         print(f"[Aviso] Se ignoraron {lineas_invalidas} línea(s) con formato inválido.")

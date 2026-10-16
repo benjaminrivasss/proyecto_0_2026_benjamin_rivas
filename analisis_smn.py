@@ -22,7 +22,6 @@ def main():
     mostrar_resumen(observaciones)
 
 
-main()
 
 if __name__ == "__main__":
     main()
