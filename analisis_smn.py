@@ -3,49 +3,34 @@ from pathlib import Path
 
 from funciones_smn import (
     leer_observaciones,
-    guardar_json,
-    leer_json,
-    cantidad_ciudades,
-    cantidad_ciudades_completas
+    mostrar_resumen
 )
+
+from smn import main as main_smn
 
 
 def main():
     """
-    Ejecuta el programa principal.
+    Ejecuta el análisis meteorológico original
+    y las funcionalidades de la nueva consigna.
     """
 
+    main_smn()
+
     if len(sys.argv) != 2:
-        print("Uso: python3 analisis_smn.py datos/observaciones_smn.txt")
         return
 
     ruta = sys.argv[1]
 
-    extension = Path(ruta).suffix.lower()
-
-    print(f"Extensión detectada: {extension}")
-
-    if extension == ".txt":
-        print("Archivo del SMN, convirtiendo a JSON...")
-
-        observaciones = leer_observaciones(ruta)
-
-        if len(observaciones) == 0:
-            return
-
-        guardar_json(observaciones, ruta)
-
-    elif extension == ".json":
-        print("Archivo JSON detectado.")
-
-        observaciones = leer_json(ruta)
-
-    else:
-        print("Error: extensión no soportada.")
+    if Path(ruta).suffix.lower() != ".txt":
         return
 
-    print(f"Cantidad de ciudades: {cantidad_ciudades(observaciones)}")
-    print(f"Cantidad de ciudades completas: {cantidad_ciudades_completas(observaciones)}")
+    observaciones = leer_observaciones(ruta)
+
+    if len(observaciones) == 0:
+        return
+
+    mostrar_resumen(observaciones)
 
 
 if __name__ == "__main__":

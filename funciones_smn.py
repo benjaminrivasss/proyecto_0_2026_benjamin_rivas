@@ -329,3 +329,20 @@ def leer_json(ruta: str) -> dict:
         observaciones = json.load(archivo)
 
     return observaciones
+
+def contar_archivos(carpeta: str, extension: str) -> int:
+    """
+    Cuenta archivos de una extensión dentro de una carpeta.
+    """
+    directorio = Path(carpeta)
+
+    if not directorio.is_dir():
+        return 0
+
+    cantidad = 0
+
+    for archivo in directorio.glob(f"*{extension}"):
+        if archivo.is_file():
+            cantidad += 1
+
+    return cantidad
